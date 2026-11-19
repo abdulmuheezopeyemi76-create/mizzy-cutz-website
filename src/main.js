@@ -194,7 +194,14 @@ function shell() {
             <label>Phone number
               <input name="phone" required maxlength="20" placeholder="Your phone number">
             </label>
-
+<label>Email address
+  <input
+    name="customer_email"
+    type="email"
+    required
+    maxlength="150"
+    placeholder="Your email address">
+</label>
             <label>Choose a service
               <select name="service_id" id="booking-service" required></select>
             </label>
@@ -530,6 +537,7 @@ function bindBooking() {
       const { error } = await supabase.rpc('create_booking', {
         p_customer_name: payload.customer_name.trim(),
         p_phone: payload.phone.trim(),
+        p_customer_email: payload.customer_email.trim(),
         p_service_id: payload.service_id,
         p_service_name: chosen.name,
         p_appointment_date: payload.appointment_date,
