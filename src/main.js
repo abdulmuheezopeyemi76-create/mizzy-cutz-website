@@ -30,7 +30,15 @@ let gallery = [];
 let currentSession = null;
 let currentScreen = 0;
 
-const screens = ['home', 'services', 'gallery', 'book', 'contact'];
+const screens = [
+  'home',
+  'services',
+  'gallery',
+  'book',
+  'announcements',
+  'contact'
+];
+
 const openingHours = { start: 9, end: 21 };
 const app = document.querySelector('#app');
 
@@ -84,7 +92,11 @@ function shell() {
         ${screens.map((screen, index) => `
           <button class="nav-link ${index === 0 ? 'active' : ''}"
             data-screen="${screen}">
-            ${screen === 'book' ? 'Booking' : screen.charAt(0).toUpperCase() + screen.slice(1)}
+            ${screen === 'book'
+              ? 'Booking'
+              : screen === 'announcements'
+                ? 'News'
+                : screen.charAt(0).toUpperCase() + screen.slice(1)}
           </button>
         `).join('')}
       </nav>
@@ -175,10 +187,8 @@ function shell() {
             <div class="contact-card">
               <span>CALL / WHATSAPP</span>
               <strong>09029061551</strong>
-              <span>HOME SERVICE</span>
-              <strong>Contact us to confirm availability.</strong>
               <span>PAYMENT</span>
-              <strong>Pay after service. No deposit required.</strong>
+              <strong>Optional deposit or pay after service.</strong>
               <span>OPENING HOURS</span>
               <strong>9AM – 9PM</strong>
             </div>
@@ -194,14 +204,12 @@ function shell() {
             <label>Phone number
               <input name="phone" required maxlength="20" placeholder="Your phone number">
             </label>
-<label>Email address
-  <input
-    name="customer_email"
-    type="email"
-    required
-    maxlength="150"
-    placeholder="Your email address">
-</label>
+
+            <label>Email address
+              <input name="customer_email" type="email" required maxlength="150"
+                placeholder="Your email address">
+            </label>
+
             <label>Choose a service
               <select name="service_id" id="booking-service" required></select>
             </label>
@@ -236,25 +244,39 @@ function shell() {
             </label>
 
             <label>House address
-              <textarea name="customer_address" required maxlength="250" placeholder="Enter your house address"></textarea>
+              <textarea name="customer_address" required maxlength="250"
+                placeholder="Enter your house address"></textarea>
             </label>
 
             <label>Google Maps location link (optional)
-              <input name="maps_link" type="url" maxlength="300" placeholder="Paste a Google Maps link">
+              <input name="maps_link" type="url" maxlength="300"
+                placeholder="Paste a Google Maps link">
             </label>
 
             <label>Additional note (optional)
-              <textarea name="note" maxlength="300" placeholder="Anything else we should know?"></textarea>
+              <textarea name="note" maxlength="300"
+                placeholder="Anything else we should know?"></textarea>
             </label>
 
             <button class="button full" type="submit">CONFIRM BOOKING ↗</button>
-            <p class="form-hint">No deposit required. Pay after service.</p>
+            <p class="form-hint">A deposit is optional. You can pay after service.</p>
             <div id="booking-message" aria-live="polite"></div>
           </form>
         </div>
       </section>
 
-      <section class="screen" id="contact" data-index="4">
+      <section class="screen" id="announcements" data-index="4">
+        <div class="section">
+          <p class="eyebrow">MIZZY CUTZ UPDATES</p>
+          <h2>THE LATEST<br><em>NEWS.</em></h2>
+          <p class="section-note">Announcements and updates from MIZZY CUTZ.</p>
+          <div id="announcements-list" class="announcements-list">
+            Loading announcements…
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="contact" data-index="5">
         <div class="section contact-screen">
           <p class="eyebrow">STAY CONNECTED</p>
           <h2>FOLLOW <em>MIZZY CUTZ.</em></h2>
@@ -310,6 +332,7 @@ function shell() {
   bindBooking();
   bindAdmin();
   renderGallery();
+  renderAnnouncements();
 }
 
 function goToScreen(screen) {
@@ -334,6 +357,8 @@ function goToScreen(screen) {
   document.querySelector('#next-screen').disabled = index === screens.length - 1;
 
   history.replaceState(null, '', `#${screen}`);
+
+  if (screen === 'announcements') renderAnnouncements();
 }
 
 function bindNavigation() {
@@ -366,9 +391,8 @@ function bindNavigation() {
     const differenceX = endX - startX;
     const differenceY = endY - startY;
 
-    if (Math.abs(differenceX) < 70 || Math.abs(differenceX) < Math.abs(differenceY)) {
-      return;
-    }
+    if (Math.abs(differenceX) < 70 ||
+        Math.abs(differenceX) < Math.abs(differenceY)) return;
 
     if (differenceX < 0 && currentScreen < screens.length - 1) {
       goToScreen(screens[currentScreen + 1]);
@@ -427,7 +451,8 @@ async function renderGallery() {
     if (!error && data) {
       gallery = data.map(photo => ({
         ...photo,
-        url: supabase.storage.from('gallery').getPublicUrl(photo.storage_path).data.publicUrl
+        url: supabase.storage.from('gallery')
+          .getPublicUrl(photo.storage_path).data.publicUrl
       }));
     }
   }
@@ -451,6 +476,158 @@ async function renderGallery() {
         <p>Our haircut gallery will appear here when photos are uploaded.</p>
       </div>
     `;
+}
+
+async function renderAnnouncements() {
+  const element = document.querySelector('#announcements-list');
+  if (!element) return;
+
+  if (!configured) {
+    element.textContent = 'Announcements are not available right now.';
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('customer_announcements')
+    .select('id,title,message,created_at')
+    .eq('status', 'sent')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    element.textContent = 'Could not load announcements. Please try again later.';
+    return;
+  }
+
+  element.innerHTML = data?.length
+    ? data.map(item => `
+        <article class="announcement-card">
+          <p class="eyebrow">MIZZY CUTZ UPDATE</p>
+          <h3>${esc(item.title)}</h3>
+          <p>${esc(item.message).replace(/\n/g, '<br>')}</p>
+          <small>${new Date(item.created_at).toLocaleDateString('en-NG')}</small>
+        </article>
+      `).join('')
+    : '<p>No announcements yet. Check back soon.</p>';
+}
+
+function showPaymentChoices(booking) {
+  const message = document.querySelector('#booking-message');
+
+  message.innerHTML = `
+    <div class="payment-panel">
+      <h3>BOOKING REQUEST RECEIVED</h3>
+      <p>Your booking request has been received. MIZZY CUTZ will review it.</p>
+      <h3>HOW WOULD YOU LIKE TO PAY?</h3>
+      <div class="payment-options">
+        <button type="button" class="button" id="pay-now">
+          I'VE TRANSFERRED
+        </button>
+        <button type="button" class="small-button" id="pay-later">
+          I'LL PAY AFTER SERVICE
+        </button>
+      </div>
+      <div id="payment-details"></div>
+    </div>
+  `;
+
+  document.querySelector('#pay-later').onclick = () => {
+    message.querySelector('#payment-details').innerHTML =
+      '<p class="message success">No deposit needed. You can pay after your service.</p>';
+  };
+
+  document.querySelector('#pay-now').onclick = () => {
+    message.querySelector('#payment-details').innerHTML = `
+      <div class="payment-instructions">
+        <h3>OPay TRANSFER DETAILS</h3>
+        <p>Account name: <strong>Abdulmuheez Saheed Opeyemi</strong></p>
+        <p>Account number: <strong>9126282831</strong></p>
+        <p>Transfer your chosen amount, then upload your receipt below.</p>
+
+        <form id="receipt-form">
+          <label>Amount transferred (₦)
+            <input name="amount" type="number" min="1" max="10000000"
+              step="1" required placeholder="Enter amount">
+          </label>
+
+          <label>Upload transfer receipt
+            <input name="receipt" type="file"
+              accept="image/jpeg,image/png,image/webp,application/pdf" required>
+          </label>
+
+          <button class="button full" type="submit">SUBMIT RECEIPT</button>
+          <div id="receipt-message" aria-live="polite"></div>
+        </form>
+      </div>
+    `;
+
+    document.querySelector('#receipt-form').onsubmit = async event => {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const amount = Number(formData.get('amount'));
+      const file = formData.get('receipt');
+      const receiptMessage = document.querySelector('#receipt-message');
+      const submitButton = form.querySelector('[type="submit"]');
+
+      if (!Number.isFinite(amount) || amount <= 0 || amount > 10000000) {
+        receiptMessage.textContent = 'Enter a valid payment amount.';
+        return;
+      }
+
+      if (!file || file.size > 5 * 1024 * 1024) {
+        receiptMessage.textContent = 'Choose a receipt under 5 MB.';
+        return;
+      }
+
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'application/pdf'
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        receiptMessage.textContent = 'Use a JPG, PNG, WEBP or PDF receipt.';
+        return;
+      }
+
+      submitButton.disabled = true;
+      receiptMessage.textContent = 'Uploading your receipt…';
+
+      try {
+        const extension = file.name.split('.').pop().toLowerCase()
+          .replace(/[^a-z0-9]/g, '');
+
+        const path = `${booking.id}/${crypto.randomUUID()}.${extension}`;
+
+        const upload = await supabase.storage
+          .from('payment-receipts')
+          .upload(path, file, { contentType: file.type });
+
+        if (upload.error) throw upload.error;
+
+        const submission = await supabase.rpc('submit_booking_payment', {
+          p_booking_id: booking.id,
+          p_amount: amount,
+          p_receipt_path: path
+        });
+
+        if (submission.error) throw submission.error;
+
+        receiptMessage.className = 'message success';
+        receiptMessage.textContent =
+          'Receipt submitted. Your payment is pending owner verification.';
+        form.reset();
+      } catch (error) {
+        receiptMessage.className = 'message error';
+        receiptMessage.textContent =
+          `Receipt submission failed: ${error.message || 'Please try again.'}`;
+      } finally {
+        submitButton.disabled = false;
+      }
+    };
+  };
 }
 
 function bindBooking() {
@@ -487,7 +664,8 @@ function bindBooking() {
       `).join('');
 
     if (!available.length) {
-      time.innerHTML = '<option value="">No slots available — choose another date</option>';
+      time.innerHTML =
+        '<option value="">No slots available — choose another date</option>';
     }
   });
 
@@ -498,13 +676,13 @@ function bindBooking() {
 
     if (!configured) {
       message.className = 'message error';
-      message.textContent = 'Online booking is not connected yet. Please contact MIZZY CUTZ.';
+      message.textContent =
+        'Online booking is not connected yet. Please contact MIZZY CUTZ.';
       return;
     }
 
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
-
     const chosen = services.find(service => service.id === payload.service_id);
 
     if (!chosen) {
@@ -514,7 +692,7 @@ function bindBooking() {
     }
 
     const locationNote = [
-      `CUSTOMER LOCATION`,
+      'CUSTOMER LOCATION',
       `State: ${payload.customer_state}`,
       `City: ${payload.customer_city}`,
       `Area: ${payload.customer_area}`,
@@ -528,13 +706,13 @@ function bindBooking() {
     ].filter(Boolean).join('\n\n');
 
     message.className = 'message';
-    message.textContent = 'Reserving your appointment…';
+    message.textContent = 'Sending your booking request…';
 
     const button = form.querySelector('[type="submit"]');
     button.disabled = true;
 
     try {
-      const { error } = await supabase.rpc('create_booking', {
+      const { data, error } = await supabase.rpc('create_booking', {
         p_customer_name: payload.customer_name.trim(),
         p_phone: payload.phone.trim(),
         p_customer_email: payload.customer_email.trim(),
@@ -545,21 +723,18 @@ function bindBooking() {
         p_note: completeNote
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      message.className = 'message success';
-      message.textContent =
-        `Your appointment is confirmed, ${payload.customer_name}! ` +
-        `${chosen.name} · ${payload.appointment_date} · ${timeLabel(payload.start_time)}. ` +
-        'We look forward to seeing you at MIZZY CUTZ.';
+      if (!data) {
+        throw new Error('Booking was saved but no booking reference was returned.');
+      }
 
       form.reset();
       time.innerHTML = '<option value="">Select date first</option>';
+
+      showPaymentChoices({ id: data });
     } catch (error) {
       message.className = 'message error';
-
       message.textContent = error.message?.includes('slot_taken')
         ? 'Sorry, that time was just booked. Please choose another time.'
         : `Booking failed: ${error.message || 'Please try again.'}`;
@@ -670,6 +845,8 @@ async function renderAdmin() {
 
     <div class="admin-tabs">
       <button data-tab="bookings" class="active">Bookings</button>
+      <button data-tab="payments">Payments</button>
+      <button data-tab="announcements">News</button>
       <button data-tab="prices">Prices</button>
       <button data-tab="photos">Gallery</button>
     </div>
@@ -721,9 +898,10 @@ async function renderAdminTab(tab) {
             <div>
               <strong>${esc(booking.customer_name)}</strong>
               <p>${esc(booking.service_name)} · ${esc(booking.appointment_date)}</p>
-              <p>${esc(booking.start_time.slice(0, 5))} · ${esc(booking.phone)}</p>
+              <p>${esc(String(booking.start_time).slice(0, 5))} · ${esc(booking.phone)}</p>
+              <p>${esc(booking.customer_email || '')}</p>
               <p class="booking-note">${esc(booking.note || '')}</p>
-              <small>${esc(booking.status.toUpperCase())}</small>
+              <small>${esc((booking.status || 'pending').toUpperCase())}</small>
             </div>
 
             <div class="admin-actions">
@@ -749,6 +927,153 @@ async function renderAdminTab(tab) {
         renderAdminTab('bookings');
       };
     });
+
+  } else if (tab === 'payments') {
+    panel.innerHTML = '<p>Loading payments…</p>';
+
+    const { data, error } = await supabase
+      .from('booking_payments')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      panel.textContent = error.message;
+      return;
+    }
+
+    if (!data?.length) {
+      panel.innerHTML = '<p>No payment receipts submitted yet.</p>';
+      return;
+    }
+
+    panel.innerHTML = '';
+
+    for (const payment of data) {
+      const item = document.createElement('article');
+      item.className = 'admin-booking';
+
+      const signed = await supabase.storage
+        .from('payment-receipts')
+        .createSignedUrl(payment.receipt_path, 3600);
+
+      const receiptLink = signed.data?.signedUrl
+        ? `<a href="${esc(signed.data.signedUrl)}" target="_blank" rel="noopener noreferrer">VIEW RECEIPT ↗</a>`
+        : '<span>Receipt link unavailable</span>';
+
+      item.innerHTML = `
+        <div>
+          <strong>${money(Number(payment.amount))}</strong>
+          <p>Booking ID: ${esc(payment.booking_id)}</p>
+          <p>Status: ${esc(payment.status.toUpperCase())}</p>
+          <p>${new Date(payment.created_at).toLocaleString('en-NG')}</p>
+          ${receiptLink}
+        </div>
+        <div class="admin-actions">
+          <button type="button" data-payment-status="verified">Verify</button>
+          <button type="button" data-payment-status="rejected">Reject</button>
+        </div>
+      `;
+
+      item.querySelectorAll('[data-payment-status]').forEach(button => {
+        button.onclick = async () => {
+          const newStatus = button.dataset.paymentStatus;
+
+          const { error: updateError } = await supabase
+            .from('booking_payments')
+            .update({ status: newStatus })
+            .eq('id', payment.id);
+
+          if (updateError) {
+            alert(updateError.message);
+            return;
+          }
+
+          renderAdminTab('payments');
+        };
+      });
+
+      panel.appendChild(item);
+    }
+
+  } else if (tab === 'announcements') {
+    const { data, error } = await supabase
+      .from('customer_announcements')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      panel.textContent = error.message;
+      return;
+    }
+
+    panel.innerHTML = `
+      <form id="announcement-form">
+        <h3>NEW CUSTOMER ANNOUNCEMENT</h3>
+
+        <label>Announcement title
+          <input name="title" maxlength="120" required
+            placeholder="e.g. Special update">
+        </label>
+
+        <label>Message
+          <textarea name="message" maxlength="1500" required
+            placeholder="Write your announcement"></textarea>
+        </label>
+
+        <button class="button full" type="submit">PUBLISH ANNOUNCEMENT</button>
+        <div id="announcement-message" aria-live="polite"></div>
+      </form>
+
+      <h3>PREVIOUS ANNOUNCEMENTS</h3>
+
+      <div class="admin-announcement-list">
+        ${data?.length ? data.map(item => `
+          <article class="announcement-card">
+            <h3>${esc(item.title)}</h3>
+            <p>${esc(item.message).replace(/\n/g, '<br>')}</p>
+            <small>${esc(item.status.toUpperCase())} ·
+              ${new Date(item.created_at).toLocaleDateString('en-NG')}
+            </small>
+          </article>
+        `).join('') : '<p>No announcements published yet.</p>'}
+      </div>
+    `;
+
+    document.querySelector('#announcement-form').onsubmit = async event => {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const message = document.querySelector('#announcement-message');
+      const button = form.querySelector('[type="submit"]');
+
+      button.disabled = true;
+      message.textContent = 'Publishing…';
+
+      const { error: insertError } = await supabase
+        .from('customer_announcements')
+        .insert({
+          title: String(formData.get('title')).trim(),
+          message: String(formData.get('message')).trim(),
+          status: 'sent',
+          created_by: currentSession.user.id
+        });
+
+      button.disabled = false;
+
+      if (insertError) {
+        message.className = 'message error';
+        message.textContent = insertError.message;
+        return;
+      }
+
+      message.className = 'message success';
+      message.textContent = 'Announcement published on the website.';
+      form.reset();
+
+      renderAdminTab('announcements');
+      renderAnnouncements();
+    };
 
   } else if (tab === 'prices') {
     panel.innerHTML = services.map(service => `
@@ -784,7 +1109,7 @@ async function renderAdminTab(tab) {
       };
     });
 
-  } else {
+  } else if (tab === 'photos') {
     panel.innerHTML = `
       <form id="upload-form">
         <label>Photo caption
@@ -902,6 +1227,7 @@ async function init() {
   if (configured) {
     await loadServices();
     await renderGallery();
+    await renderAnnouncements();
 
     supabase.auth.onAuthStateChange((_event, session) => {
       currentSession = session;
