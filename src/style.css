@@ -272,3 +272,69 @@ footer > span {
     padding: 25px 18px;
   }
 }
+
+/* MIZZY CUTZ BLACK & GOLD LUXURY THEME */
+
+:root {
+  --bg: #080808;
+  --panel: #141414;
+  --lime: #D4AF37;
+  --line: #4A3A18;
+  --muted: #B5A989;
+}
+
+body {
+  background: #080808;
+  color: #F5F0E3;
+}
+
+h1, h2, h3, h4,
+.logo, .brand {
+  color: #D4AF37;
+}
+
+button,
+.button,
+.admin-tabs button.active {
+  background: #D4AF37;
+  color: #080808;
+  border: 1px solid #E8C65A;
+}
+
+button:hover,
+.button:hover {
+  background: #F0D477;
+  color: #080808;
+}
+
+.service-card,
+.booking-form,
+.modal-card,
+.admin-photo-list > div {
+  background: #141414;
+  border-color: #80651F;
+}
+
+input, select, textarea {
+  background: #101010;
+  color: #FFFFFF;
+  border: 1px solid #80651F;
+}
+
+.final-cta {
+  background: #D4AF37;
+  color: #080808;
+}
+
+.final-cta .eyebrow {
+  color: #30240A;
+}
+
+.final-cta h2 em {
+  color: #4A3510;
+}
+
+footer {
+  background: #080808;
+  color: #D4AF37;
+}
