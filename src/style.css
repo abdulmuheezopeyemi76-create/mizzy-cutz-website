@@ -961,3 +961,97 @@ footer > span {
     text-align: center;
   }
 }
+
+/* MIZZY CUTZ PAYMENT STYLING */
+.payment-panel {
+  margin-top: 25px;
+  padding: 25px;
+  background: #141414;
+  border: 1px solid var(--gold);
+}
+
+.payment-panel h3 {
+  color: var(--gold);
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.payment-panel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  margin-bottom: 12px;
+}
+
+.payment-options {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.payment-options button {
+  width: 100%;
+  padding: 15px;
+  background: var(--gold);
+  color: #080808;
+  border: 1px solid var(--gold-light);
+  font-weight: 800;
+}
+
+.payment-instructions {
+  margin-top: 20px;
+  padding: 20px;
+  background: #090909;
+  border: 1px solid var(--line);
+}
+
+.payment-instructions strong {
+  color: var(--gold);
+}
+
+/* CUSTOMER ANNOUNCEMENTS */
+.announcements-list {
+  display: grid;
+  gap: 18px;
+}
+
+.announcement-card {
+  padding: 25px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.announcement-card h3 {
+  color: var(--gold);
+  font-size: 23px;
+  margin-bottom: 12px;
+}
+
+.announcement-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+}
+
+.admin-announcement-list {
+  margin-top: 20px;
+}
+
+.admin-announcement-list > div {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+
+/* KEEP THE NEW SECTIONS MOBILE-FRIENDLY */
+@media (max-width: 600px) {
+  .payment-panel,
+  .announcement-card {
+    padding: 18px;
+  }
+
+  .payment-options button {
+    padding: 13px;
+  }
+}
