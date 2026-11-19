@@ -44,34 +44,244 @@ const timeLabel = t => {
 };
 const app = document.querySelector('#app');
 
+
 function shell() {
   app.innerHTML = `
-    <header class="topbar"><a class="brand" href="#home">MIZZY<span>CUTZ.</span></a>
-      <nav><a href="#services">Services</a><a href="#gallery">Gallery</a><a href="#book">Book now</a></nav>
-      <a class="nav-cta" href="#book">Book a cut <span>↗</span></a>
+    <header class="topbar">
+      <a class="brand" href="#home">MIZZY<span>CUTZ.</span></a>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#book">Booking</a>
+      </nav>
+      <a class="nav-cta" href="#book">BOOK A CUT ↗</a>
     </header>
+
     <main>
       <section class="hero" id="home">
-        <div class="hero-copy"><p class="eyebrow">OYSCATECH · OPEN DAILY 9AM–9PM</p>
-          <h1>YOUR CUT.<br><em>YOUR</em> CONFIDENCE.</h1>
-          <p class="intro">Clean cuts, sharp details and fresh confidence. Pull up to MIZZY CUTZ and leave looking your best.</p>
-          <div class="hero-actions"><a class="button" href="#book">BOOK YOUR APPOINTMENT <span>↗</span></a><a class="text-link" href="#services">Explore services ↓</a></div>
-          <div class="hero-meta"><span>01 — QUALITY SERVICE</span><span>02 — CLEAN FINISH</span><span>03 — GOOD ENERGY</span></div>
+        <div class="hero-copy">
+          <p class="eyebrow">MIZZY CUTZ · OPEN DAILY 9AM–9PM</p>
+          <h1>LOOK GOOD.<br><em>FEEL GREAT.</em></h1>
+          <p class="intro">Clean cuts, sharp details and fresh confidence. Experience the difference at MIZZY CUTZ.</p>
+          <div class="hero-actions">
+            <a class="button" href="#book">BOOK YOUR APPOINTMENT ↗</a>
+            <a class="text-link" href="#services">Explore services ↓</a>
+          </div>
+          <div class="hero-meta">
+            <span>QUALITY SERVICE</span>
+            <span>CLEAN FINISH</span>
+            <span>GOOD ENERGY</span>
+          </div>
         </div>
-        <div class="hero-art"><div class="art-circle"></div><div class="art-word">M<br>C</div><div class="art-caption">THE FRESH<br>LOOK STARTS HERE.</div><div class="art-stamp">MIZZY<br>CUTZ<br>✳</div></div>
+        <div class="hero-art">
+          <img class="hero-photo"
+            src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=85"
+            alt="Professional barber haircut">
+          <div class="art-caption">THE FRESH LOOK STARTS HERE.</div>
+          <div class="art-stamp">MIZZY<br>CUTZ<br>✳</div>
+        </div>
       </section>
-      <section class="ticker"><span>FRESH CUTS</span><b>✳</b><span>SHARP FINISH</span><b>✳</b><span>GOOD ENERGY</span><b>✳</b><span>MIZZY CUTZ</span></section>
-      <section class="section" id="services"><div class="section-head"><div><p class="eyebrow">WHAT WE DO</p><h2>THE SERVICE<br><em>MENU.</em></h2></div><p class="section-note">The details matter. Choose your service and book a time that works for you.</p></div><div id="service-grid" class="service-grid"></div></section>
-      <section class="gallery-section" id="gallery"><div class="section-head"><div><p class="eyebrow">THE WORK SPEAKS</p><h2>FRESH FROM<br><em>THE CHAIR.</em></h2></div><p class="section-note">A look at cuts and styles from MIZZY CUTZ.</p></div><div id="gallery-grid" class="gallery-grid"></div></section>
-      <section class="booking-section" id="book"><div class="booking-intro"><p class="eyebrow">YOUR NEXT LOOK IS ONE BOOKING AWAY</p><h2>BOOK YOUR<br><em>FRESH CUT.</em></h2><p>Choose a service, date and available time. Your appointment is confirmed once the slot is successfully reserved.</p><div class="contact-card"><span>CALL / WHATSAPP</span><strong>09029061551</strong><span>LOCATION</span><strong>OYSCATECH</strong><span>PAYMENT</span><strong>Pay at the shop · No deposit</strong></div></div>
-        <form id="booking-form" class="booking-form"><h3>MAKE AN APPOINTMENT</h3><label>Your name<input name="customer_name" required maxlength="80" placeholder="Full name"></label><label>Phone number<input name="phone" required maxlength="20" placeholder="Your phone number"></label><label>Choose a service<select name="service_id" id="booking-service" required></select></label><div class="form-row"><label>Date<input type="date" name="appointment_date" min="${dateToday()}" required></label><label>Time<select name="start_time" id="booking-time" required><option value="">Select date first</option></select></label></div><label>Note (optional)<textarea name="note" maxlength="300" placeholder="Anything we should know?"></textarea></label><button class="button full" type="submit">CONFIRM BOOKING <span>↗</span></button><p class="form-hint">No deposit required. Pay at the shop.</p><div id="booking-message" aria-live="polite"></div></form>
+
+      <section class="ticker">
+        <span>FRESH CUTS</span><b>✳</b>
+        <span>SHARP FINISH</span><b>✳</b>
+        <span>GOOD ENERGY</span><b>✳</b>
+        <span>MIZZY CUTZ</span>
       </section>
-      <section class="final-cta"><p class="eyebrow">MIZZY CUTZ · OYSCATECH</p><h2>STAY FRESH.<br><em>STAY SHARP.</em></h2><a class="button" href="#book">BOOK YOUR CUT ↗</a></section>
+
+      <section class="section" id="services">
+        <div class="section-head">
+          <div><p class="eyebrow">WHAT WE DO</p><h2>THE SERVICE<br><em>MENU.</em></h2></div>
+          <p class="section-note">Choose your service and book a time that works for you.</p>
+        </div>
+        <div id="service-grid" class="service-grid"></div>
+      </section>
+
+      <section class="gallery-section" id="gallery">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">THE WORK SPEAKS</p>
+            <h2>FRESH FROM<br><em>THE CHAIR.</em></h2>
+          </div>
+          <p class="section-note">A look at cuts and styles from MIZZY CUTZ.</p>
+        </div>
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </section>
+
+        <div class="section-head">
+          <div><p class="eyebrow">THE WORK SPEAKS</p><h2>FRESH FROM<br><em>THE CHAIR.</em></h2></div>
+          <p class="section-note">A look at cuts and styles from MIZZY CUTZ.</p>
+        </div> 
+          <div class="hero-meta">
+            <span>QUALITY SERVICE</span>
+            <span>CLEAN FINISH</span>
+            <span>GOOD ENERGY</span>
+          </div>
+        </div>
+        <div class="hero-art">
+          <img class="hero-photo"
+            src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1200&q=85"
+            alt="Professional barber haircut">
+          <div class="art-caption">THE FRESH LOOK STARTS HERE.</div>
+          <div class="art-stamp">MIZZY<br>CUTZ<br>✳</div>
+        </div>
+      </section>
+
+      <section class="ticker">
+        <span>FRESH CUTS</span><b>✳</b>
+        <span>SHARP FINISH</span><b>✳</b>
+        <span>GOOD ENERGY</span><b>✳</b>
+        <span>MIZZY CUTZ</span>
+      </section>
+
+      <section class="section" id="services">
+        <div class="section-head">
+          <div><p class="eyebrow">WHAT WE DO</p><h2>THE SERVICE<br><em>MENU.</em></h2></div>
+          <p class="section-note">Choose your service and book a time that works for you.</p>
+        </div>
+        <div id="service-grid" class="service-grid"></div>
+      </section>
+
+      <section class="gallery-section" id="gallery">
+        <div class="section-head">
+          <div><p class="eyebrow">THE WORK SPEAKS</p><h2>FRESH FROM<br><em>THE CHAIR.</em></h2></div>
+          <p class="section-note">A look at cuts and styles from MIZZY CUTZ.</p>
+        </div>
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </section>
+
+      <section class="booking-section" id="book">
+        <div class="booking-intro">
+          <p class="eyebrow">YOUR NEXT LOOK IS ONE BOOKING AWAY</p>
+          <h2>BOOK YOUR<br><em>FRESH CUT.</em></h2>
+          <p>Choose a service, date and available time. Your appointment is reserved once successfully booked.</p>
+          <div class="contact-card">
+            <span>CALL / WHATSAPP</span><strong>09029061551</strong>
+            <span>HOME SERVICE</span><strong>We come to your location. Contact us to confirm availability.</strong>
+            <span>PAYMENT</span><strong>Pay after service · No deposit</strong>
+            <span>OPENING HOURS</span><strong>9AM – 9PM</strong>
+          </div>
+        </div>
+
+        <form id="booking-form" class="booking-form">
+          <h3>MAKE AN APPOINTMENT</h3>
+          <label>Your name<input name="customer_name" required maxlength="80" placeholder="Full name"></label>
+          <label>Phone number<input name="phone" required maxlength="20" placeholder="Your phone number"></label>
+          <label>Choose a service<select name="service_id" id="booking-service" required></select></label>
+          <div class="form-row">
+            <label>Date<input type="date" name="appointment_date" min="${dateToday()}" required></label>
+            <label>Time<select name="start_time" id="booking-time" required><option value="">Select date first</option></select></label>
+          </div>
+          <label>Note (optional)<textarea name="note" maxlength="300" placeholder="Anything we should know?"></textarea></label>
+          <button class="button full" type="submit">CONFIRM BOOKING ↗</button>
+          <p class="form-hint">No deposit required. Pay after service.</p>
+          <div id="booking-message" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <section class="follow-section">
+        <p class="eyebrow">STAY CONNECTED</p>
+        <h2>FOLLOW <em>MIZZY CUTZ.</em></h2>
+        <p>Follow our work, see fresh styles and contact us.</p>
+        <div class="social-links">
+          <a href="https://www.tiktok.com/@Mizzylivinglarge2x" target="_blank" rel="noopener noreferrer">TIKTOK ↗</a>
+          <a href="https://wa.me/2349029061551" target="_blank" rel="noopener noreferrer">WHATSAPP ↗</a>
+        </div>
+      </section>
+
+      <section class="final-cta">
+        <p class="eyebrow">MIZZY CUTZ</p>
+        <h2>STAY FRESH.<br><em>STAY SHARP.</em></h2>
+        <a class="button" href="#book">BOOK YOUR CUT ↗</a>
+      </section>
     </main>
-    <footer><a class="brand" href="#home">MIZZY<span>CUTZ.</span></a><span>© ${new Date().getFullYear()} MIZZY CUTZ. ALL RIGHTS RESERVED.</span><button id="admin-open" class="admin-link">OWNER LOGIN</button></footer>
-    <div id="admin-modal" class="modal hidden"><div class="modal-card"><button class="close" id="admin-close" aria-label="Close">×</button><div id="admin-content"></div></div></div>`;
-  renderServices(); renderGallery(); bindBooking(); bindAdmin();
+
+    <footer>
+      <a class="brand" href="#home">MIZZY<span>CUTZ.</span></a>
+      <span>© ${new Date().getFullYear()} MIZZY CUTZ. ALL RIGHTS RESERVED.</span>
+      <button id="admin-open" class="admin-link">OWNER LOGIN</button>
+    </footer>
+
+    <div id="admin-modal" class="modal hidden">
+      <div class="modal-card">
+        <button class="close" id="admin-close" aria-label="Close">×</button>
+        <div id="admin-content"></div>
+      </div>
+    </div>`;
+  renderServices();
+  renderGallery();
+  bindBooking();
+  bindAdmin();
 }
+
+        <div id="gallery-grid" class="gallery-grid"></div>
+      </section>
+
+      <section class="booking-section" id="book">
+        <div class="booking-intro">
+          <p class="eyebrow">YOUR NEXT LOOK IS ONE BOOKING AWAY</p>
+          <h2>BOOK YOUR<br><em>FRESH CUT.</em></h2>
+          <p>Choose a service, date and available time. Your appointment is reserved once successfully booked.</p>
+          <div class="contact-card">
+            <span>CALL / WHATSAPP</span><strong>09029061551</strong>
+            <span>HOME SERVICE</span><strong>We come to your location. Contact us to confirm availability.</strong>
+            <span>PAYMENT</span><strong>Pay after service · No deposit</strong>
+            <span>OPENING HOURS</span><strong>9AM – 9PM</strong>
+          </div>
+        </div>
+        <form id="booking-form" class="booking-form">
+          <h3>MAKE AN APPOINTMENT</h3>
+          <label>Your name<input name="customer_name" required maxlength="80" placeholder="Full name"></label>
+          <label>Phone number<input name="phone" required maxlength="20" placeholder="Your phone number"></label>
+          <label>Choose a service<select name="service_id" id="booking-service" required></select></label>
+          <div class="form-row">
+            <label>Date<input type="date" name="appointment_date" min="${dateToday()}" required></label>
+            <label>Time<select name="start_time" id="booking-time" required><option value="">Select date first</option></select></label>
+          </div>
+          <label>Note (optional)<textarea name="note" maxlength="300" placeholder="Anything we should know?"></textarea></label>
+          <button class="button full" type="submit">CONFIRM BOOKING ↗</button>
+          <p class="form-hint">No deposit required. Pay after service.</p>
+          <div id="booking-message" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <section class="follow-section">
+        <p class="eyebrow">STAY CONNECTED</p>
+        <h2>FOLLOW <em>MIZZY CUTZ.</em></h2>
+        <p>Follow our work, see fresh styles and contact us.</p>
+        <div class="social-links">
+          <a href="https://www.tiktok.com/@Mizzylivinglarge2x" target="_blank" rel="noopener noreferrer">TIKTOK ↗</a>
+          <a href="https://wa.me/2349029061551" target="_blank" rel="noopener noreferrer">WHATSAPP ↗</a>
+        </div>
+      </section>
+
+      <section class="final-cta">
+        <p class="eyebrow">MIZZY CUTZ</p>
+        <h2>STAY FRESH.<br><em>STAY SHARP.</em></h2>
+        <a class="button" href="#book">BOOK YOUR CUT ↗</a>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand" href="#home">MIZZY<span>CUTZ.</span></a>
+      <span>© ${new Date().getFullYear()} MIZZY CUTZ. ALL RIGHTS RESERVED.</span>
+      <button id="admin-open" class="admin-link">OWNER LOGIN</button>
+    </footer>
+
+    <div id="admin-modal" class="modal hidden">
+      <div class="modal-card">
+        <button class="close" id="admin-close" aria-label="Close">×</button>
+        <div id="admin-content"></div>
+      </div>
+    </div>`;
+  renderServices();
+  renderGallery();
+  bindBooking();
+  bindAdmin();
+}
+
+
 function renderServices(){
   document.querySelector('#service-grid').innerHTML=services.map((s,i)=>`<article class="service-card"><span class="service-no">0${i+1}</span><div><h3>${esc(s.name)}</h3><p>${esc(s.description||'Made fresh at MIZZY CUTZ.')}</p></div><strong>${s.price==null?'Price on request':money(s.price)}</strong></article>`).join('');
   document.querySelector('#booking-service').innerHTML='<option value="">Select a service</option>'+services.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} — ${s.price==null?'Price on request':money(s.price)}</option>`).join('');
