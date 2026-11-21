@@ -1,4 +1,4 @@
-```javascript
+
 import { createClient } from '@supabase/supabase-js';
 import './style.css';
 
@@ -58,6 +58,7 @@ const esc = value =>
     "'": '&#39;'
   })[char]);
 
+
 const dateToday = () => {
   const date = new Date();
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
@@ -82,42 +83,6 @@ const timeLabel = value => {
   const [hour, minute] = value.split(':').map(Number);
   return `${((hour + 11) % 12) + 1}:${String(minute).padStart(2, '0')} ${hour < 12 ? 'AM' : 'PM'}`;
 };
-
-// Request an email notification through the Supabase Edge Function.
-async function sendBookingNotification(event, bookingId) {
-  // Email notifications are optional; a booking must not fail because email fails.
-  if (!supabase || !configured || !bookingId) {
-    console.warn(`${event} notification skipped: Supabase or booking reference is missing.`);
-    return false;
-  }
-
-  try {
-    const { data, error } = await supabase.functions.invoke(
-      'mizzy-booking-email',
-      {
-        body: {
-          event,
-          booking_id: bookingId
-        }
-      }
-    );
-
-    if (error) {
-      console.error(`${event} notification failed:`, error);
-      return false;
-    }
-
-    if (data?.error) {
-      console.error(`${event} notification failed:`, data.error);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error(`${event} notification failed:`, error);
-    return false;
-  }
-}
 
 function shell() {
   app.innerHTML = `
@@ -664,7 +629,9 @@ function showPaymentChoices(booking) {
       }
     };
   };
-}function bindBooking() {
+}
+
+function bindBooking() {
   const form = document.querySelector('#booking-form');
   const date = form.elements.appointment_date;
   const time = document.querySelector('#booking-time');
@@ -775,22 +742,11 @@ function showPaymentChoices(booking) {
         throw new Error('Booking was saved but no booking reference was returned.');
       }
 
-      // Notify the owner about the new booking request.
-      // The booking remains pending until manually approved.
-      const notificationSent = await sendBookingNotification('new_booking', data);
-
       form.reset();
       time.innerHTML = '<option value="">Select date first</option>';
 
       showPaymentChoices({ id: data });
 
-      if (!notificationSent) {
-        const notice = document.createElement('p');
-        notice.className = 'message';
-        notice.textContent =
-          'Your booking was received. The owner notification needs attention.';
-        message.querySelector('.payment-panel').appendChild(notice);
-      }
     } catch (error) {
       message.className = 'message error';
       message.textContent = error.message?.includes('slot_taken')
@@ -932,7 +888,9 @@ async function renderAdmin() {
   });
 
   renderAdminTab('bookings');
-}async function renderAdminTab(tab) {
+}
+
+async function renderAdminTab(tab) {
   const panel = document.querySelector('#admin-panel');
   if (!panel) return;
 
@@ -980,20 +938,6 @@ async function renderAdmin() {
         if (error) {
           alert(error.message);
           return;
-        }
-
-        // Send the customer confirmation only after manual approval.
-        if (newStatus === 'confirmed') {
-          const sent = await sendBookingNotification(
-            'confirmed',
-            button.dataset.id
-          );
-
-          if (!sent) {
-            alert(
-              'Booking confirmed, but the customer email failed. Please check your Resend setup.'
-            );
-          }
         }
 
         renderAdminTab('bookings');
