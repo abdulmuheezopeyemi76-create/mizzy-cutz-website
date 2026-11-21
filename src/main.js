@@ -1,4 +1,4 @@
-
+```javascript
 import { createClient } from '@supabase/supabase-js';
 import './style.css';
 
@@ -85,27 +85,38 @@ const timeLabel = value => {
 
 // Request an email notification through the Supabase Edge Function.
 async function sendBookingNotification(event, bookingId) {
-  const { data, error } = await supabase.functions.invoke(
-    'mizzy-booking-email',
-    {
-      body: {
-        event,
-        booking_id: bookingId
-      }
-    }
-  );
+  // Email notifications are optional; a booking must not fail because email fails.
+  if (!supabase || !configured || !bookingId) {
+    console.warn(`${event} notification skipped: Supabase or booking reference is missing.`);
+    return false;
+  }
 
-  if (error) {
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      'mizzy-booking-email',
+      {
+        body: {
+          event,
+          booking_id: bookingId
+        }
+      }
+    );
+
+    if (error) {
+      console.error(`${event} notification failed:`, error);
+      return false;
+    }
+
+    if (data?.error) {
+      console.error(`${event} notification failed:`, data.error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
     console.error(`${event} notification failed:`, error);
     return false;
   }
-
-  if (data?.error) {
-    console.error(`${event} notification failed:`, data.error);
-    return false;
-  }
-
-  return true;
 }
 
 function shell() {
@@ -653,9 +664,7 @@ function showPaymentChoices(booking) {
       }
     };
   };
-}
-
-function bindBooking() {
+}function bindBooking() {
   const form = document.querySelector('#booking-form');
   const date = form.elements.appointment_date;
   const time = document.querySelector('#booking-time');
@@ -709,6 +718,18 @@ function bindBooking() {
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
     const chosen = services.find(service => service.id === payload.service_id);
+
+    if (!payload.appointment_date || !payload.start_time) {
+      message.className = 'message error';
+      message.textContent = 'Please choose an appointment date and an available time.';
+      return;
+    }
+
+    if (payload.appointment_date < dateToday()) {
+      message.className = 'message error';
+      message.textContent = 'Please choose today or a future date.';
+      return;
+    }
 
     if (!chosen) {
       message.className = 'message error';
@@ -911,9 +932,7 @@ async function renderAdmin() {
   });
 
   renderAdminTab('bookings');
-}
-
-async function renderAdminTab(tab) {
+}async function renderAdminTab(tab) {
   const panel = document.querySelector('#admin-panel');
   if (!panel) return;
 
